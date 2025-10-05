@@ -1,0 +1,51 @@
+<!doctype html>
+<html>
+<head>
+    <title>{{ profile_user.display_name }}'s Profile - My Blog</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Pacifico&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-content">
+            <img src="{{ url_for('static', filename='logo.png') }}" class="logo-small" alt="Logo">
+            <a href="{{ url_for('home') }}">Home</a>
+            {% if user %}
+                <a href="{{ url_for('profile', username=user.username) }}">Profile</a>
+                <a href="{{ url_for('logout') }}">Logout</a>
+            {% else %}
+                <a href="{{ url_for('login') }}">Login</a>
+                <a href="{{ url_for('register') }}">Register</a>
+            {% endif %}
+        </div>
+    </nav>
+    <div class="container">
+        <img src="{% if profile_user.profile_picture %}{{ url_for('static', filename='uploads/profiles/' ~ profile_user.profile_picture) }}{% else %}{{ url_for('static', filename='logo.png') }}{% endif %}" alt="Profile Pic" class="profile-pic">
+        <h1>{{ profile_user.display_name }}</h1>
+        <p>@{{ profile_user.username }}</p>
+        {% if profile_user.bio %}
+        <p><em>{{ profile_user.bio }}</em></p>
+        {% endif %}
+        {% if user and user.id == profile_user.id %}
+        <p><a href="{{ url_for('edit_profile') }}">Edit Profile</a></p>
+        {% endif %}
+        <hr>
+        <h2>Posts by {{ profile_user.display_name }}:</h2>
+        {% for post in profile_user.posts|reverse %}
+            <div class="post-preview">
+                <h2><a href="{{ url_for('post_detail', post_id=post.id) }}">{{ post.title }}</a></h2>
+                {% if post.images %}
+                <div class="post-gallery">
+                    {% for img in post.images[:1] %}
+                      <img src="{{ url_for('static', filename='uploads/posts/' ~ img.filename) }}" alt="Post image" class="post-image-preview">
+                    {% endfor %}
+                </div>
+                {% endif %}
+                <p>{{ post.content[:100] }}{% if post.content|length > 100 %}...{% endif %}</p>
+            </div>
+        {% else %}
+            <p>No posts yet.</p>
+        {% endfor %}
+    </div>
+</body>
+</html>

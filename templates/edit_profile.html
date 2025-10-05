@@ -1,0 +1,49 @@
+<!doctype html>
+<html>
+<head>
+    <title>Edit Profile - My Blog</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Pacifico&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-content">
+            <img src="{{ url_for('static', filename='logo.png') }}" class="logo-small" alt="Logo">
+            <a href="{{ url_for('home') }}">Home</a>
+            {% if user %}
+                <a href="{{ url_for('profile', username=user.username) }}">Profile</a>
+                <a href="{{ url_for('logout') }}">Logout</a>
+            {% else %}
+                <a href="{{ url_for('login') }}">Login</a>
+                <a href="{{ url_for('register') }}">Register</a>
+            {% endif %}
+        </div>
+    </nav>
+    <div class="login-form-box">
+        <img src="{% if user.profile_picture %}{{ url_for('static', filename='uploads/profiles/' ~ user.profile_picture) }}{% else %}{{ url_for('static', filename='logo.png') }}{% endif %}" alt="Profile Pic" class="profile-pic">
+        <h1>Edit Profile</h1>
+        <form method="POST" enctype="multipart/form-data">
+            {{ form.hidden_tag() }}
+            <p>
+                {{ form.display_name.label }}<br>
+                {{ form.display_name(size=32) }}
+            </p>
+            <p>
+                {{ form.bio.label }}<br>
+                {{ form.bio(cols=32, rows=3) }}
+            </p>
+            <p>
+                {{ form.profile_picture.label }}<br>
+                {{ form.profile_picture() }}
+            </p>
+            {% if user.profile_picture %}
+            <p>
+                <button type="submit" name="remove_picture" value="1">Remove Profile Picture</button>
+            </p>
+            {% endif %}
+            <p>{{ form.submit() }}</p>
+        </form>
+        <a href="{{ url_for('profile', username=user.username) }}">← Back to Profile</a>
+    </div>
+</body>
+</html>
