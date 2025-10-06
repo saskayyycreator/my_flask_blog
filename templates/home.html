@@ -1,27 +1,33 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Blog</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Pacifico&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <nav class="navbar">
         <div class="nav-content">
             <img src="{{ url_for('static', filename='logo.png') }}" class="logo-small" alt="Logo">
-            <a href="{{ url_for('home') }}">Home</a>
-            {% if user %}
-                <a href="{{ url_for('profile', username=user.username) }}">Profile</a>
-                <a href="{{ url_for('logout') }}">Logout</a>
-            {% else %}
-                <a href="{{ url_for('login') }}">Login</a>
-                <a href="{{ url_for('register') }}">Register</a>
-            {% endif %}
+            <div class="nav-links">
+                <a href="{{ url_for('home') }}">Home</a>
+                {% if user %}
+                    <a href="{{ url_for('profile', username=user.username) }}">Profile</a>
+                    <a href="{{ url_for('logout') }}">Logout</a>
+                {% else %}
+                    <a href="{{ url_for('login') }}">Login</a>
+                    <a href="{{ url_for('register') }}">Register</a>
+                {% endif %}
+            </div>
         </div>
     </nav>
+
     <div class="container">
         <img src="{{ url_for('static', filename='logo.png') }}" alt="My Blog Logo" class="logo">
         <h1>Welcome to Saskayyy Blog!</h1>
+
         {% with messages = get_flashed_messages(with_categories=true) %}
           {% if messages %}
             {% for category, message in messages %}
@@ -29,9 +35,15 @@
             {% endfor %}
           {% endif %}
         {% endwith %}
+
         {% if user %}
-            <p>Logged in as <a href="{{ url_for('profile', username=user.username) }}">{{ user.display_name }}</a></p>
-            <form action="{{ url_for('home') }}" method="post" enctype="multipart/form-data">
+            <p>Logged in as 
+                <a href="{{ url_for('profile', username=user.username) }}">
+                    {{ user.display_name }}
+                </a>
+            </p>
+
+            <form action="{{ url_for('home') }}" method="post" enctype="multipart/form-data" class="post-form">
                 {{ form.hidden_tag() }}
                 <input type="text" name="title" placeholder="Post Title" value="{{ form.title.data or '' }}" required><br>
                 <textarea name="content" placeholder="Post Content" required>{{ form.content.data or '' }}</textarea><br>
@@ -39,22 +51,31 @@
                 <button type="submit">Add Post</button>
             </form>
         {% else %}
-            <p><a href="{{ url_for('login') }}">Login</a> or <a href="{{ url_for('register') }}">Register</a> to add posts.</p>
+            <p>
+                <a href="{{ url_for('login') }}">Login</a> or 
+                <a href="{{ url_for('register') }}">Register</a> to add posts.
+            </p>
         {% endif %}
+
         <hr>
+
         {% for post in posts %}
             <div class="post-preview">
-                <h2><a href="{{ url_for('post_detail', post_id=post.id) }}">{{ post.title }}</a></h2>
+                <h2>
+                    <a href="{{ url_for('post_detail', post_id=post.id) }}">{{ post.title }}</a>
+                </h2>
                 <p>
                     by <a href="{{ url_for('profile', username=post.author.username) }}">{{ post.author.display_name }}</a>
                 </p>
+
                 {% if post.images %}
-                  <div class="post-gallery">
-                    {% for img in post.images[:1] %}
-                      <img src="{{ url_for('static', filename='uploads/posts/' ~ img.filename) }}" alt="Post image" class="post-image-preview">
-                    {% endfor %}
-                  </div>
+                    <div class="post-gallery">
+                        {% for img in post.images[:1] %}
+                            <img src="{{ url_for('static', filename='uploads/posts/' ~ img.filename) }}" alt="Post image" class="post-image-preview">
+                        {% endfor %}
+                    </div>
                 {% endif %}
+
                 <p>{{ post.content[:100] }}{% if post.content|length > 100 %}...{% endif %}</p>
             </div>
         {% endfor %}
